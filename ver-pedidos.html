@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App-Repartos - Ver Pedidos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf7f4;
+    --surface: #ffffff;
+    --border: #e9e0d8;
+    --text: #2f2b28;
+    --text-soft: #8c8177;
+    --gold: #b9935a;
+    --gold-deep: #8f6f3f;
+    --pink: #d98fa1;
+    --pink-deep: #b96780;
+    --ok: #6f8f6a;
+    --fail: #b1615f;
+    --back: #a08b76;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Karla', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--gold-deep);
+    margin: 0 0 4px 0;
+  }
+  #estado {
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--text-soft);
+  }
+  .pedido {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 2px rgba(47,43,40,0.04);
+  }
+  .pedido h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    color: var(--text);
+  }
+  .campo {
+    font-size: 14px;
+    margin: 3px 0;
+    color: var(--text);
+  }
+  .campo b {
+    color: var(--text-soft);
+    font-weight: 500;
+  }
+  .estado-pendiente { color: var(--gold-deep); font-weight: 700; }
+  .estado-en_camino { color: var(--pink-deep); font-weight: 700; }
+  .estado-entregado { color: var(--ok); font-weight: 700; }
+  .estado-no_entregado { color: var(--fail); font-weight: 700; }
+  .estado-devuelto { color: var(--back); font-weight: 700; }
+
+  @media (min-width: 640px) {
+    body { padding: 32px; max-width: 720px; margin: 0 auto; }
+  }
+</style>
+</head>
+<body>
+
+<h1>App-Repartos — Pedidos en vivo</h1>
+<div style="margin-bottom:10px;"><a href="panel-admin.html" style="color:var(--gold-deep); font-size:13px; font-weight:700; text-decoration:none;">⚙ Ir a Administración</a></div>
+<div id="estado">Conectando a Firestore...</div>
+<div id="lista"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA91GQFimdsUUukDs4ew6uj6TPLj51nNWQ",
+    authDomain: "app-repartos-f3fda.firebaseapp.com",
+    projectId: "app-repartos-f3fda",
+    storageBucket: "app-repartos-f3fda.firebasestorage.app",
+    messagingSenderId: "831323740955",
+    appId: "1:831323740955:web:60d96b496aefb0047151be",
+    measurementId: "G-P2HLKEBY9S"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const estadoDiv = document.getElementById("estado");
+  const listaDiv = document.getElementById("lista");
+
+  const pedidosRef = collection(db, "Pedidos");
+
+  const nombresEstado = {
+    pendiente: "Pendiente",
+    en_camino: "En camino",
+    entregado: "Entregado",
+    no_entregado: "No entregado",
+    devuelto: "Devuelto"
+  };
+
+  onSnapshot(pedidosRef, (snapshot) => {
+    estadoDiv.textContent = "Conectado. " + snapshot.size + " pedido(s) encontrados. Se actualiza en tiempo real.";
+    listaDiv.innerHTML = "";
+
+    snapshot.forEach((doc) => {
+      const p = doc.data();
+      const div = document.createElement("div");
+      div.className = "pedido";
+      div.innerHTML = `
+        <h3>${doc.id}</h3>
+        <div class="campo"><b>Código de barra:</b> ${p.codigo_barra ?? "-"}</div>
+        <div class="campo"><b>Dirección:</b> ${p.direccion_entrega ?? "-"}</div>
+        <div class="campo"><b>Cliente:</b> ${p.cliente_nombre ?? "-"}</div>
+        <div class="campo"><b>Vendedor:</b> ${p.vendedor_nombre ?? p.vendedor_id ?? "-"}</div>
+        <div class="campo"><b>Repartidor:</b> ${p.repartidor_nombre ?? p.repartidor_id ?? "-"}</div>
+        <div class="campo estado-${p.estado}"><b>Estado:</b> ${nombresEstado[p.estado] ?? p.estado ?? "-"}</div>
+      `;
+      listaDiv.appendChild(div);
+    });
+  }, (error) => {
+    estadoDiv.textContent = "Error al conectar: " + error.message;
+    estadoDiv.style.color = "var(--fail)";
+  });
+</script>
+
+</body>
+</html>

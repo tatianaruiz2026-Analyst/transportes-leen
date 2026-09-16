@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>App-Repartos - Administración</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#b9935a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf7f4;
+    --surface: #ffffff;
+    --surface-alt: #f2ece6;
+    --border: #e9e0d8;
+    --text: #2f2b28;
+    --text-soft: #8c8177;
+    --gold: #b9935a;
+    --gold-deep: #8f6f3f;
+    --gold-soft: #f1e4cd;
+    --pink: #d98fa1;
+    --pink-deep: #b96780;
+    --pink-soft: #f7e4e9;
+    --ok: #6f8f6a;
+    --ok-soft: #e6ede4;
+    --fail: #b1615f;
+    --fail-soft: #f3e2e1;
+    --back: #a08b76;
+    --back-soft: #efe7dd;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Karla', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding-bottom: 90px;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  header .marca {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--gold-deep);
+  }
+  header a.volver {
+    font-size: 12px;
+    color: var(--text-soft);
+    text-decoration: none;
+    background: var(--surface-alt);
+    padding: 6px 12px;
+    border-radius: 20px;
+  }
+  .contenido {
+    padding: 16px;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  #estadoConexion {
+    font-size: 12px;
+    color: var(--text-soft);
+    margin-bottom: 14px;
+  }
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+  }
+  .tabs button {
+    flex: 1;
+    white-space: nowrap;
+    padding: 10px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 700;
+    background: var(--surface);
+    color: var(--text-soft);
+    font-family: inherit;
+  }
+  .tabs button.activo {
+    background: var(--gold-deep);
+    color: #fff;
+    border-color: var(--gold-deep);
+  }
+  .registro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .registro .fila-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .registro .nombre {
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .registro .detalle {
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-top: 4px;
+  }
+  .registro .badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .badge.pendiente { background: var(--gold-soft); color: var(--gold-deep); }
+  .badge.en_camino { background: var(--pink-soft); color: var(--pink-deep); }
+  .badge.entregado { background: var(--ok-soft); color: var(--ok); }
+  .badge.no_entregado { background: var(--fail-soft); color: var(--fail); }
+  .badge.devuelto { background: var(--back-soft); color: var(--back); }
+  .btn-editar {
+    margin-top: 10px;
+    width: 100%;
+    padding: 9px;
+    background: var(--surface-alt);
+    color: var(--text);
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+  }
+  .vacio {
+    text-align: center;
+    color: var(--text-soft);
+    font-size: 13px;
+    padding: 30px 0;
+  }
+  .fab {
+    position: fixed;
+    right: 20px;
+    bottom: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--gold-deep);
+    color: #fff;
+    border: none;
+    font-size: 26px;
+    box-shadow: 0 4px 14px rgba(143,111,63,0.4);
+    z-index: 10;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(47,43,40,0.55);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 50;
+  }
+  .modal-overlay.oculto { display: none; }
+  .modal-caja {
+    background: var(--surface);
+    width: 100%;
+    max-width: 480px;
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  @media (min-width: 540px) {
+    .modal-overlay { align-items: center; }
+    .modal-caja { border-radius: 18px; }
+  }
+  .modal-caja h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    margin: 0 0 14px 0;
+    font-size: 17px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .btn-cerrar {
+    background: var(--surface-alt);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 14px;
+    color: var(--text-soft);
+  }
+  .campo-form {
+    margin-bottom: 14px;
+  }
+  .campo-form label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-soft);
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .campo-form input, .campo-form select, .campo-form textarea {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .campo-form textarea { min-height: 70px; resize: vertical; }
+  .btn-guardar {
+    width: 100%;
+    padding: 13px;
+    background: var(--gold-deep);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    margin-top: 6px;
+  }
+  .btn-eliminar {
+    width: 100%;
+    padding: 13px;
+    background: var(--fail-soft);
+    color: var(--fail);
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    margin-top: 10px;
+  }
+  .btn-texto {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text-soft);
+    font-size: 13px;
+    padding: 10px;
+    font-family: inherit;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="marca">⚙ Administración</div>
+  <a href="dashboard-repartidor.html" class="volver">← Dashboard</a>
+</header>
+
+<div class="contenido">
+  <div id="estadoConexion">Conectando a Firestore...</div>
+
+  <div class="tabs">
+    <button class="activo" data-tipo="pedidos">Pedidos</button>
+    <button data-tipo="clientes">Clientes</button>
+    <button data-tipo="vendedores">Vendedores</button>
+    <button data-tipo="repartidores">Repartidores</button>
+  </div>
+
+  <div id="listaRegistros"></div>
+</div>
+
+<button class="fab" id="btnAgregar">+</button>
+
+<div id="modalForm" class="modal-overlay oculto">
+  <div class="modal-caja">
+    <h3><span id="tituloForm">Agregar</span><button class="btn-cerrar" id="cerrarForm">✕</button></h3>
+    <div id="camposForm"></div>
+    <button class="btn-guardar" id="btnGuardar">Guardar</button>
+    <button class="btn-eliminar oculto" id="btnEliminar">Eliminar</button>
+    <button class="btn-texto" id="btnCancelarForm">Cancelar</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+<script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyA91GQFimdsUUukDs4ew6uj6TPLj51nNWQ",
+    authDomain: "app-repartos-f3fda.firebaseapp.com",
+    projectId: "app-repartos-f3fda",
+    storageBucket: "app-repartos-f3fda.firebasestorage.app",
+    messagingSenderId: "831323740955",
+    appId: "1:831323740955:web:60d96b496aefb0047151be"
+  };
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.firestore();
+
+  var nombresEstado = {
+    pendiente: "Pendiente",
+    en_camino: "En camino",
+    entregado: "Entregado",
+    no_entregado: "No entregado",
+    devuelto: "Devuelto"
+  };
+
+  // ---------- Configuración de cada tipo de entidad ----------
+  var configEntidades = {
+    clientes: {
+      coleccion: "Clientes",
+      titulo: "cliente",
+      campos: [
+        { clave: "nombre", etiqueta: "Nombre", tipo: "text", requerido: true },
+        { clave: "telefono", etiqueta: "Teléfono (con código de país, ej: 56912345678)", tipo: "tel", requerido: true },
+        { clave: "direccion", etiqueta: "Dirección habitual", tipo: "text" },
+        { clave: "notas", etiqueta: "Notas", tipo: "textarea" }
+      ]
+    },
+    vendedores: {
+      coleccion: "Vendedores",
+      titulo: "vendedor",
+      campos: [
+        { clave: "nombre", etiqueta: "Nombre", tipo: "text", requerido: true },
+        { clave: "telefono", etiqueta: "Teléfono (con código de país, ej: 56912345678)", tipo: "tel", requerido: true },
+        { clave: "notas", etiqueta: "Notas", tipo: "textarea" }
+      ]
+    },
+    repartidores: {
+      coleccion: "repartidores",
+      titulo: "repartidor",
+      campos: [
+        { clave: "nombre", etiqueta: "Nombre", tipo: "text", requerido: true },
+        { clave: "telefono", etiqueta: "Teléfono", tipo: "tel" },
+        { clave: "vehiculo", etiqueta: "Vehículo", tipo: "text" }
+      ]
+    },
+    pedidos: {
+      coleccion: "Pedidos",
+      titulo: "pedido",
+      campos: [
+        { clave: "codigo_barra", etiqueta: "Código de barra / QR", tipo: "text", requerido: true },
+        { clave: "cliente_id", etiqueta: "Cliente", tipo: "select-clientes", requerido: true },
+        { clave: "direccion_entrega", etiqueta: "Dirección de entrega", tipo: "text", requerido: true },
+        { clave: "vendedor_id", etiqueta: "Vendedor", tipo: "select-vendedores", requerido: true },
+        { clave: "repartidor_id", etiqueta: "Repartidor", tipo: "select-repartidores" },
+        { clave: "estado", etiqueta: "Estado", tipo: "select-estado", requerido: true }
+      ]
+    }
+  };
+
+  var cache = { clientes: [], vendedores: [], repartidores: [], pedidos: [] };
+  var tipoActivo = "pedidos";
+  var editandoId = null;
+  var conteoConectado = 0;
+  var totalColecciones = 4;
+
+  function suscribirColeccion(tipo) {
+    var nombreColeccion = configEntidades[tipo].coleccion;
+    db.collection(nombreColeccion).onSnapshot(function(snapshot) {
+      var registros = [];
+      snapshot.forEach(function(doc) { registros.push({ id: doc.id, data: doc.data() }); });
+      cache[tipo] = registros;
+      if (conteoConectado < totalColecciones) conteoConectado++;
+      document.getElementById("estadoConexion").textContent =
+        "Conectado. " + cache.clientes.length + " clientes, " + cache.vendedores.length +
+        " vendedores, " + cache.repartidores.length + " repartidores, " + cache.pedidos.length + " pedidos.";
+      if (tipo === tipoActivo) renderLista();
+    }, function(error) {
+      document.getElementById("estadoConexion").textContent = "Error al conectar (" + nombreColeccion + "): " + error.message;
+    });
+  }
+
+  Object.keys(configEntidades).forEach(suscribirColeccion);
+
+  // ---------- Tabs ----------
+  document.querySelectorAll(".tabs button").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      document.querySelectorAll(".tabs button").forEach(function(b) { b.classList.remove("activo"); });
+      btn.classList.add("activo");
+      tipoActivo = btn.getAttribute("data-tipo");
+      renderLista();
+    });
+  });
+
+  // ---------- Render de la lista ----------
+  function renderLista() {
+    var contenedor = document.getElementById("listaRegistros");
+    var registros = cache[tipoActivo];
+    contenedor.innerHTML = "";
+
+    if (!registros || registros.length === 0) {
+      contenedor.innerHTML = "<div class='vacio'>Todavía no hay " + tipoActivo + ". Toca + para agregar el primero.</div>";
+      return;
+    }
+
+    registros.forEach(function(item) {
+      var p = item.data;
+      var div = document.createElement("div");
+      div.className = "registro";
+
+      if (tipoActivo === "pedidos") {
+        var cliente = buscarPorId("clientes", p.cliente_id);
+        var vendedor = buscarPorId("vendedores", p.vendedor_id);
+        var repartidor = buscarPorId("repartidores", p.repartidor_id);
+        var estadoClase = p.estado || "pendiente";
+        div.innerHTML =
+          "<div class='fila-top'>" +
+            "<div>" +
+              "<div class='nombre'>📦 " + (p.codigo_barra || item.id) + "</div>" +
+              "<div class='detalle'>" + (p.direccion_entrega || "Sin dirección") + "</div>" +
+              "<div class='detalle'>Cliente: " + (p.cliente_nombre || (cliente ? cliente.data.nombre : "-")) + "</div>" +
+              "<div class='detalle'>Vendedor: " + (p.vendedor_nombre || (vendedor ? vendedor.data.nombre : "-")) + "</div>" +
+              "<div class='detalle'>Repartidor: " + (p.repartidor_nombre || (repartidor ? repartidor.data.nombre : "Sin asignar")) + "</div>" +
+            "</div>" +
+            "<span class='badge " + estadoClase + "'>" + (nombresEstado[p.estado] || p.estado || "-") + "</span>" +
+          "</div>" +
+          "<button class='btn-editar' data-id='" + item.id + "'>Editar</button>";
+      } else {
+        div.innerHTML =
+          "<div class='nombre'>" + (p.nombre || "-") + "</div>" +
+          "<div class='detalle'>" + (p.telefono || "Sin teléfono") + "</div>" +
+          (p.direccion ? "<div class='detalle'>" + p.direccion + "</div>" : "") +
+          (p.vehiculo ? "<div class='detalle'>Vehículo: " + p.vehiculo + "</div>" : "") +
+          "<button class='btn-editar' data-id='" + item.id + "'>Editar</button>";
+      }
+      contenedor.appendChild(div);
+    });
+
+    contenedor.querySelectorAll(".btn-editar").forEach(function(btn) {
+      btn.addEventListener("click", function() { abrirForm(btn.getAttribute("data-id")); });
+    });
+  }
+
+  function buscarPorId(tipo, id) {
+    if (!id) return null;
+    return cache[tipo].find(function(it) { return it.id === id; }) || null;
+  }
+
+  // ---------- Formulario (agregar / editar) ----------
+  var modalForm = document.getElementById("modalForm");
+
+  document.getElementById("btnAgregar").addEventListener("click", function() { abrirForm(null); });
+
+  function abrirForm(id) {
+    editandoId = id;
+    var config = configEntidades[tipoActivo];
+    var registro = id ? buscarPorId(tipoActivo, id) : null;
+    var datos = registro ? registro.data : {};
+
+    document.getElementById("tituloForm").textContent = (id ? "Editar " : "Agregar ") + config.titulo;
+    document.getElementById("btnEliminar").classList.toggle("oculto", !id);
+
+    var contenedorCampos = document.getElementById("camposForm");
+    contenedorCampos.innerHTML = "";
+
+    config.campos.forEach(function(campo) {
+      var envoltorio = document.createElement("div");
+      envoltorio.className = "campo-form";
+      var label = document.createElement("label");
+      label.textContent = campo.etiqueta;
+      envoltorio.appendChild(label);
+
+      var elemento;
+      if (campo.tipo === "textarea") {
+        elemento = document.createElement("textarea");
+        elemento.value = datos[campo.clave] || "";
+      } else if (campo.tipo.indexOf("select-") === 0) {
+        elemento = document.createElement("select");
+        var origen = campo.tipo === "select-estado" ? null : campo.tipo.replace("select-", "");
+        if (origen) {
+          elemento.innerHTML = "<option value=''>Sin asignar</option>" + cache[origen].map(function(it) {
+            var seleccionado = datos[campo.clave] === it.id ? "selected" : "";
+            return "<option value='" + it.id + "' " + seleccionado + ">" + (it.data.nombre || it.id) + "</option>";
+          }).join("");
+        } else {
+          elemento.innerHTML = Object.keys(nombresEstado).map(function(clave) {
+            var seleccionado = (datos.estado || "pendiente") === clave ? "selected" : "";
+            return "<option value='" + clave + "' " + seleccionado + ">" + nombresEstado[clave] + "</option>";
+          }).join("");
+        }
+      } else {
+        elemento = document.createElement("input");
+        elemento.type = campo.tipo;
+        elemento.value = datos[campo.clave] || "";
+      }
+      elemento.id = "campo_" + campo.clave;
+      elemento.dataset.clave = campo.clave;
+      elemento.dataset.tipoCampo = campo.tipo;
+      envoltorio.appendChild(elemento);
+      contenedorCampos.appendChild(envoltorio);
+    });
+
+    modalForm.classList.remove("oculto");
+  }
+
+  function cerrarForm() {
+    modalForm.classList.add("oculto");
+    editandoId = null;
+  }
+  document.getElementById("cerrarForm").addEventListener("click", cerrarForm);
+  document.getElementById("btnCancelarForm").addEventListener("click", cerrarForm);
+
+  document.getElementById("btnGuardar").addEventListener("click", function() {
+    var config = configEntidades[tipoActivo];
+    var datosGuardar = {};
+    var faltaObligatorio = false;
+
+    config.campos.forEach(function(campo) {
+      var elemento = document.getElementById("campo_" + campo.clave);
+      var valor = elemento.value.trim();
+      if (campo.requerido && !valor) faltaObligatorio = true;
+      datosGuardar[campo.clave] = valor;
+    });
+
+    if (faltaObligatorio) {
+      alert("Completa los campos obligatorios antes de guardar.");
+      return;
+    }
+
+    // Para pedidos: guardamos también nombre y teléfono del cliente/vendedor/repartidor
+    // para que el dashboard y los avisos de WhatsApp no dependan de otra consulta.
+    if (tipoActivo === "pedidos") {
+      var cliente = buscarPorId("clientes", datosGuardar.cliente_id);
+      var vendedor = buscarPorId("vendedores", datosGuardar.vendedor_id);
+      var repartidor = buscarPorId("repartidores", datosGuardar.repartidor_id);
+      datosGuardar.cliente_nombre = cliente ? cliente.data.nombre : "";
+      datosGuardar.cliente_telefono = cliente ? cliente.data.telefono : "";
+      datosGuardar.vendedor_nombre = vendedor ? vendedor.data.nombre : "";
+      datosGuardar.vendedor_telefono = vendedor ? vendedor.data.telefono : "";
+      datosGuardar.repartidor_nombre = repartidor ? repartidor.data.nombre : "";
+      if (!datosGuardar.repartidor_id) delete datosGuardar.repartidor_id;
+    }
+
+    var coleccion = db.collection(configEntidades[tipoActivo].coleccion);
+    var promesa = editandoId
+      ? coleccion.doc(editandoId).update(datosGuardar)
+      : coleccion.add(Object.assign(datosGuardar, tipoActivo === "pedidos" ? { estado: datosGuardar.estado || "pendiente" } : {}));
+
+    promesa.then(function() {
+      cerrarForm();
+    }).catch(function(err) {
+      alert("No se pudo guardar: " + err.message);
+    });
+  });
+
+  document.getElementById("btnEliminar").addEventListener("click", function() {
+    if (!editandoId) return;
+    if (!confirm("¿Eliminar este registro? Esta acción no se puede deshacer.")) return;
+    db.collection(configEntidades[tipoActivo].coleccion).doc(editandoId).delete().then(function() {
+      cerrarForm();
+    }).catch(function(err) {
+      alert("No se pudo eliminar: " + err.message);
+    });
+  });
+</script>
+
+</body>
+</html>

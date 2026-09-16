@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>App-Repartos - Dashboard Repartidor</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#b9935a">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22App-Repartos%22%2C%22short_name%22%3A%22Repartos%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23faf7f4%22%2C%22theme_color%22%3A%22%23b9935a%22%7D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf7f4;
+    --surface: #ffffff;
+    --surface-alt: #f2ece6;
+    --border: #e9e0d8;
+    --text: #2f2b28;
+    --text-soft: #8c8177;
+    --gold: #b9935a;
+    --gold-deep: #8f6f3f;
+    --gold-soft: #f1e4cd;
+    --pink: #d98fa1;
+    --pink-deep: #b96780;
+    --pink-soft: #f7e4e9;
+    --ok: #6f8f6a;
+    --ok-soft: #e6ede4;
+    --fail: #b1615f;
+    --fail-soft: #f3e2e1;
+    --back: #a08b76;
+    --back-soft: #efe7dd;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Karla', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    padding-bottom: 24px;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  header .marca {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--gold-deep);
+  }
+  header .marca span.icono {
+    font-size: 20px;
+  }
+  header .rol {
+    font-size: 12px;
+    color: var(--text-soft);
+    background: var(--surface-alt);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+  .contenido {
+    padding: 16px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .actualizado {
+    font-size: 12px;
+    color: var(--text-soft);
+    margin-bottom: 14px;
+  }
+  .tarjeta-ruta {
+    background: linear-gradient(135deg, var(--gold-deep), var(--pink-deep));
+    border-radius: 18px;
+    padding: 22px;
+    margin-bottom: 16px;
+    color: #fff;
+  }
+  .tarjeta-ruta .etiqueta {
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 700;
+  }
+  .tarjeta-ruta h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    margin: 8px 0 4px 0;
+    font-size: 22px;
+  }
+  .tarjeta-ruta p {
+    margin: 2px 0;
+    font-size: 13px;
+    color: rgba(255,255,255,0.9);
+  }
+  .fila-botones-ruta {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .btn-recorrido {
+    flex: 1;
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+  }
+  .btn-recorrido:active { background: rgba(255,255,255,0.3); }
+  .btn-ver-lista {
+    flex: 0 0 auto;
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .stat .titulo {
+    font-size: 11px;
+    color: var(--text-soft);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .stat .numero {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 600;
+  }
+  .stat.pendientes .numero { color: var(--gold-deep); }
+  .stat.entregadas .numero { color: var(--ok); }
+  .stat.retiros .numero { color: var(--pink-deep); }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .tabs button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 700;
+    background: var(--surface);
+    color: var(--text-soft);
+    font-family: inherit;
+  }
+  .tabs button.activo {
+    background: var(--gold-deep);
+    color: #fff;
+    border-color: var(--gold-deep);
+  }
+
+  h3.subtitulo {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 16px;
+    margin: 0 0 4px 0;
+  }
+  p.subtexto {
+    font-size: 12px;
+    color: var(--text-soft);
+    margin: 0 0 12px 0;
+  }
+
+  .pedido-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .pedido-item .fila-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pedido-item .codigo {
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+  }
+  .badge.pendiente { background: var(--gold-soft); color: var(--gold-deep); }
+  .badge.en_camino { background: var(--pink-soft); color: var(--pink-deep); }
+  .badge.entregado { background: var(--ok-soft); color: var(--ok); }
+  .badge.no_entregado { background: var(--fail-soft); color: var(--fail); }
+  .badge.devuelto { background: var(--back-soft); color: var(--back); }
+
+  .pedido-item .direccion {
+    font-size: 13px;
+    color: var(--text);
+    margin: 8px 0 2px 0;
+  }
+  .pedido-item .meta {
+    font-size: 12px;
+    color: var(--text-soft);
+  }
+  .btn-escanear {
+    margin-top: 10px;
+    width: 100%;
+    padding: 11px;
+    background: var(--gold-deep);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+  }
+  .btn-escanear:active { background: var(--gold); }
+  .btn-escanear:disabled { background: var(--border); color: var(--text-soft); }
+
+  #estadoConexion {
+    font-size: 12px;
+    color: var(--text-soft);
+    margin-bottom: 10px;
+  }
+
+  /* Modales */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(47,43,40,0.55);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 50;
+  }
+  .modal-overlay.oculto { display: none; }
+  .modal-caja {
+    background: var(--surface);
+    width: 100%;
+    max-width: 480px;
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+  @media (min-width: 540px) {
+    .modal-overlay { align-items: center; }
+    .modal-caja { border-radius: 18px; }
+  }
+  .modal-caja h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    font-size: 17px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .btn-cerrar {
+    background: var(--surface-alt);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 14px;
+    color: var(--text-soft);
+  }
+  #lector-camara {
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    min-height: 240px;
+  }
+  .scan-hint {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-top: 12px;
+  }
+  .codigo-detectado {
+    background: var(--surface-alt);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .aviso-no-coincide {
+    font-size: 12px;
+    color: var(--fail);
+    margin: 4px 0 14px 0;
+  }
+  .opciones-estado {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 14px 0;
+  }
+  .btn-opcion {
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    text-align: left;
+  }
+  .btn-opcion.entregado { background: var(--ok-soft); color: var(--ok); }
+  .btn-opcion.no_entregado { background: var(--fail-soft); color: var(--fail); }
+  .btn-opcion.devuelto { background: var(--back-soft); color: var(--back); }
+  .btn-texto {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text-soft);
+    font-size: 13px;
+    padding: 10px;
+    font-family: inherit;
+  }
+  .btn-wa {
+    width: 100%;
+    padding: 13px;
+    border-radius: 12px;
+    border: none;
+    background: var(--surface-alt);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+  .btn-wa:disabled { color: var(--text-soft); opacity: 0.6; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="marca"><span class="icono">📦</span> App-Repartos</div>
+  <a href="panel-admin.html" class="rol" style="text-decoration:none;">⚙ Administración</a>
+</header>
+
+<div class="contenido">
+  <div id="estadoConexion">Conectando a Firestore...</div>
+
+  <div class="tarjeta-ruta">
+    <div class="etiqueta">RUTA DE HOY</div>
+    <h2 id="tituloRuta">Cargando...</h2>
+    <p id="resumenRuta">-</p>
+    <div class="fila-botones-ruta">
+      <button class="btn-recorrido" id="btnRecorrido">📍 Abrir ruta en Maps</button>
+      <button class="btn-ver-lista" id="btnVerLista">⬇ Lista</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="stat pendientes">
+      <div class="titulo">🚚 ENTREGAS PENDIENTES</div>
+      <div class="numero" id="numPendientes">0</div>
+    </div>
+    <div class="stat entregadas">
+      <div class="titulo">✅ ENTREGADAS HOY</div>
+      <div class="numero" id="numEntregadas">0</div>
+    </div>
+    <div class="stat retiros">
+      <div class="titulo">📦 RETIROS PENDIENTES</div>
+      <div class="numero">0</div>
+    </div>
+    <div class="stat retiros">
+      <div class="titulo">📦 PAQUETES POR RETIRAR</div>
+      <div class="numero">0</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="activo">Mis entregas</button>
+    <button>Retiros</button>
+  </div>
+
+  <h3 class="subtitulo">Ruta activa</h3>
+  <p class="subtexto">Tu recorrido de entregas del día.</p>
+
+  <div id="listaPedidos"></div>
+</div>
+
+<!-- Modal: cámara -->
+<div id="modalScanner" class="modal-overlay oculto">
+  <div class="modal-caja">
+    <h3>Escanear pedido <button class="btn-cerrar" id="cerrarScanner">✕</button></h3>
+    <div id="lector-camara"></div>
+    <p class="scan-hint">Apunta la cámara al código de barras o QR del paquete.</p>
+  </div>
+</div>
+
+<!-- Modal: elegir estado -->
+<div id="modalEstado" class="modal-overlay oculto">
+  <div class="modal-caja">
+    <h3>Pedido escaneado <button class="btn-cerrar" id="cerrarEstado">✕</button></h3>
+    <div class="codigo-detectado" id="codigoEscaneado">-</div>
+    <div id="avisoNoCoincide" class="aviso-no-coincide" style="display:none;">El código leído no coincide con el de este pedido. Revisa antes de continuar.</div>
+    <div class="opciones-estado">
+      <button class="btn-opcion entregado" data-estado="entregado">✅ Marcar como entregado</button>
+      <button class="btn-opcion no_entregado" data-estado="no_entregado">❌ No se pudo entregar</button>
+      <button class="btn-opcion devuelto" data-estado="devuelto">↩️ Devuelto a origen</button>
+    </div>
+    <button class="btn-texto" id="cancelarEstado">Cancelar</button>
+  </div>
+</div>
+
+<!-- Modal: avisar por WhatsApp -->
+<div id="modalWhatsapp" class="modal-overlay oculto">
+  <div class="modal-caja">
+    <h3>Avisar por WhatsApp <button class="btn-cerrar" id="cerrarWhatsapp">✕</button></h3>
+    <p class="subtexto">Se abre WhatsApp con el mensaje ya escrito. Solo falta que presiones enviar.</p>
+    <button class="btn-wa" id="btnWaCliente">📲 Avisar al cliente</button>
+    <button class="btn-wa" id="btnWaVendedor">📲 Avisar al vendedor</button>
+    <button class="btn-texto" id="listoWhatsapp">Listo, terminar</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyA91GQFimdsUUukDs4ew6uj6TPLj51nNWQ",
+    authDomain: "app-repartos-f3fda.firebaseapp.com",
+    projectId: "app-repartos-f3fda",
+    storageBucket: "app-repartos-f3fda.firebasestorage.app",
+    messagingSenderId: "831323740955",
+    appId: "1:831323740955:web:60d96b496aefb0047151be"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.firestore();
+
+  var estadoDiv = document.getElementById("estadoConexion");
+  var listaDiv = document.getElementById("listaPedidos");
+  var numPendientes = document.getElementById("numPendientes");
+  var numEntregadas = document.getElementById("numEntregadas");
+  var tituloRuta = document.getElementById("tituloRuta");
+  var resumenRuta = document.getElementById("resumenRuta");
+
+  var nombresEstado = {
+    pendiente: "Pendiente",
+    en_camino: "En camino",
+    entregado: "Entregado",
+    no_entregado: "No entregado",
+    devuelto: "Devuelto"
+  };
+
+  var pedidosCache = []; // [{id, data}]
+
+  db.collection("Pedidos").onSnapshot(function(snapshot) {
+    estadoDiv.textContent = "Conectado. " + snapshot.size + " pedido(s) en total.";
+
+    var pendientesCount = 0;
+    var entregadasCount = 0;
+    var pedidos = [];
+
+    snapshot.forEach(function(doc) {
+      var p = doc.data();
+      pedidos.push({ id: doc.id, data: p });
+      if (p.estado === "pendiente" || p.estado === "en_camino") pendientesCount++;
+      if (p.estado === "entregado") entregadasCount++;
+    });
+
+    pedidosCache = pedidos;
+
+    numPendientes.textContent = pendientesCount;
+    numEntregadas.textContent = entregadasCount;
+    tituloRuta.textContent = pendientesCount + " entregas pendientes";
+    resumenRuta.textContent = snapshot.size + " pedidos en total, " + entregadasCount + " entregados";
+
+    listaDiv.innerHTML = "";
+    pedidos.forEach(function(item) {
+      var p = item.data;
+      var estadoClase = p.estado || "pendiente";
+      var div = document.createElement("div");
+      div.className = "pedido-item";
+      div.innerHTML =
+        "<div class='fila-top'>" +
+          "<span class='codigo'>📦 " + (p.codigo_barra || item.id) + "</span>" +
+          "<span class='badge " + estadoClase + "'>" + (nombresEstado[p.estado] || p.estado || "-") + "</span>" +
+        "</div>" +
+        "<div class='direccion'>" + (p.direccion_entrega || "Sin dirección") + "</div>" +
+        "<div class='meta'>Vendedor: " + (p.vendedor_nombre || p.vendedor_id || "-") + "</div>" +
+        "<button class='btn-escanear' data-id='" + item.id + "'>📷 Escanear y marcar entregado</button>";
+      listaDiv.appendChild(div);
+    });
+
+    // Reasignar los listeners de los botones de escanear (se recrean en cada snapshot)
+    listaDiv.querySelectorAll(".btn-escanear").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        iniciarEscaneo(btn.getAttribute("data-id"));
+      });
+    });
+
+  }, function(error) {
+    estadoDiv.textContent = "Error: " + error.message;
+    estadoDiv.style.color = "var(--fail)";
+  });
+
+  // ---------- Botón "Abrir ruta en Maps" ----------
+  document.getElementById("btnRecorrido").addEventListener("click", function() {
+    var pendientes = pedidosCache.filter(function(item) {
+      var p = item.data;
+      return (p.estado === "pendiente" || p.estado === "en_camino") && p.direccion_entrega;
+    });
+    if (pendientes.length === 0) {
+      alert("No hay direcciones pendientes para armar la ruta.");
+      return;
+    }
+    var direcciones = pendientes.map(function(item) { return item.data.direccion_entrega; });
+    var destino = encodeURIComponent(direcciones[direcciones.length - 1]);
+    var waypoints = direcciones.slice(0, -1).map(function(d) { return encodeURIComponent(d); }).join("|");
+    var url = "https://www.google.com/maps/dir/?api=1&destination=" + destino +
+      (waypoints ? "&waypoints=" + waypoints : "") + "&travelmode=driving";
+    window.open(url, "_blank");
+  });
+
+  document.getElementById("btnVerLista").addEventListener("click", function() {
+    document.getElementById("listaPedidos").scrollIntoView({ behavior: "smooth" });
+  });
+
+  // ---------- Escáner de cámara ----------
+  var pedidoEnProceso = null; // { id, data }
+  var html5QrCode = null;
+
+  var modalScanner = document.getElementById("modalScanner");
+  var modalEstado = document.getElementById("modalEstado");
+  var modalWhatsapp = document.getElementById("modalWhatsapp");
+
+  function iniciarEscaneo(pedidoId) {
+    var item = pedidosCache.find(function(it) { return it.id === pedidoId; });
+    if (!item) return;
+    pedidoEnProceso = item;
+
+    modalScanner.classList.remove("oculto");
+    html5QrCode = new Html5Qrcode("lector-camara");
+    var config = {
+      fps: 10,
+      qrbox: { width: 250, height: 150 },
+      formatsToSupport: [
+        Html5QrcodeSupportedFormats.QR_CODE,
+        Html5QrcodeSupportedFormats.CODE_128,
+        Html5QrcodeSupportedFormats.CODE_39,
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A
+      ]
+    };
+
+    html5QrCode.start(
+      { facingMode: "environment" },
+      config,
+      function(decodedText) {
+        detenerEscaneo();
+        mostrarModalEstado(decodedText);
+      },
+      function(errorMessage) { /* se ignoran los frames sin lectura */ }
+    ).catch(function(err) {
+      alert("No se pudo abrir la cámara: " + err + "\nRevisa los permisos de cámara del navegador.");
+      modalScanner.classList.add("oculto");
+    });
+  }
+
+  function detenerEscaneo() {
+    if (html5QrCode) {
+      html5QrCode.stop().then(function() {
+        html5QrCode.clear();
+        html5QrCode = null;
+      }).catch(function() { html5QrCode = null; });
+    }
+    modalScanner.classList.add("oculto");
+  }
+
+  document.getElementById("cerrarScanner").addEventListener("click", detenerEscaneo);
+
+  // ---------- Elegir estado tras escanear ----------
+  function mostrarModalEstado(codigoLeido) {
+    document.getElementById("codigoEscaneado").textContent = "Código leído: " + codigoLeido;
+    var esperado = pedidoEnProceso.data.codigo_barra;
+    var aviso = document.getElementById("avisoNoCoincide");
+    if (esperado && esperado !== codigoLeido) {
+      aviso.style.display = "block";
+    } else {
+      aviso.style.display = "none";
+    }
+    modalEstado.classList.remove("oculto");
+  }
+
+  document.querySelectorAll(".btn-opcion").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      var estado = btn.getAttribute("data-estado");
+      guardarEstado(estado);
+    });
+  });
+
+  document.getElementById("cancelarEstado").addEventListener("click", function() {
+    modalEstado.classList.add("oculto");
+    pedidoEnProceso = null;
+  });
+
+  document.getElementById("cerrarEstado").addEventListener("click", function() {
+    modalEstado.classList.add("oculto");
+    pedidoEnProceso = null;
+  });
+
+  function guardarEstado(estado) {
+    if (!pedidoEnProceso) return;
+    db.collection("Pedidos").doc(pedidoEnProceso.id).update({
+      estado: estado,
+      ultima_actualizacion: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(function() {
+      modalEstado.classList.add("oculto");
+      abrirModalWhatsapp(estado);
+    }).catch(function(err) {
+      alert("No se pudo guardar el estado: " + err.message);
+    });
+  }
+
+  // ---------- Avisos por WhatsApp ----------
+  function limpiarTelefono(tel) {
+    return (tel || "").toString().replace(/[^0-9]/g, "");
+  }
+
+  function mensajePara(destinatario, estado, p) {
+    var codigo = p.codigo_barra || pedidoEnProceso.id;
+    var textos = {
+      cliente: {
+        entregado: "Hola! Tu pedido " + codigo + " fue entregado. ¡Gracias por tu compra!",
+        no_entregado: "Hola, intentamos entregar tu pedido " + codigo + " pero no fue posible. Te contactaremos para coordinar un nuevo intento.",
+        devuelto: "Hola, tu pedido " + codigo + " fue devuelto a origen. Cualquier duda, contáctanos."
+      },
+      vendedor: {
+        entregado: "El pedido " + codigo + " fue entregado al cliente.",
+        no_entregado: "El pedido " + codigo + " no pudo ser entregado.",
+        devuelto: "El pedido " + codigo + " fue devuelto a origen."
+      }
+    };
+    return textos[destinatario][estado];
+  }
+
+  function abrirModalWhatsapp(estado) {
+    var p = pedidoEnProceso ? pedidoEnProceso.data : {};
+    var telCliente = limpiarTelefono(p.cliente_telefono);
+    var telVendedor = limpiarTelefono(p.vendedor_telefono);
+
+    var btnCliente = document.getElementById("btnWaCliente");
+    var btnVendedor = document.getElementById("btnWaVendedor");
+
+    if (telCliente) {
+      btnCliente.disabled = false;
+      btnCliente.textContent = "📲 Avisar al cliente";
+      btnCliente.onclick = function() {
+        window.open("https://wa.me/" + telCliente + "?text=" + encodeURIComponent(mensajePara("cliente", estado, p)), "_blank");
+      };
+    } else {
+      btnCliente.disabled = true;
+      btnCliente.textContent = "📲 Avisar al cliente (sin teléfono guardado)";
+      btnCliente.onclick = null;
+    }
+
+    if (telVendedor) {
+      btnVendedor.disabled = false;
+      btnVendedor.textContent = "📲 Avisar al vendedor";
+      btnVendedor.onclick = function() {
+        window.open("https://wa.me/" + telVendedor + "?text=" + encodeURIComponent(mensajePara("vendedor", estado, p)), "_blank");
+      };
+    } else {
+      btnVendedor.disabled = true;
+      btnVendedor.textContent = "📲 Avisar al vendedor (sin teléfono guardado)";
+      btnVendedor.onclick = null;
+    }
+
+    modalWhatsapp.classList.remove("oculto");
+  }
+
+  function cerrarWhatsapp() {
+    modalWhatsapp.classList.add("oculto");
+    pedidoEnProceso = null;
+  }
+  document.getElementById("cerrarWhatsapp").addEventListener("click", cerrarWhatsapp);
+  document.getElementById("listoWhatsapp").addEventListener("click", cerrarWhatsapp);
+</script>
+
+</body>
+</html>
