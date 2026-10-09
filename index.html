@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Transportes Leen - Sistema Inteligente de Gestión de Repartos</title>
+  <!-- Google Fonts & Lucide Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --dark: #0f172a;
+      --slate: #475569;
+      --light-bg: #f8fafc;
+      --border: #e2e8f0;
+      --card-bg: #ffffff;
+      --success: #10b981;
+      --radius: 16px;
+      --shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.12);
+      --shadow-lg: 0 20px 40px -15px rgba(15, 23, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--light-bg);
+      color: var(--dark);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* --- LOGO ESTILOS --- */
+    .brand-logo {
+      height: 48px;
+      width: 48px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 2px solid #eab308;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .brand-logo-hero {
+      width: 160px;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid #eab308;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      margin-bottom: 1.5rem;
+    }
+
+    /* --- NAVIGATION --- */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      padding: 0.75rem 1.5rem;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: var(--dark);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--slate);
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .btn-nav {
+      background: var(--primary);
+      color: white !important;
+      padding: 0.6rem 1.2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    /* --- HERO SECTION --- */
+    .hero {
+      padding: 8rem 1.5rem 4rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+
+    .hero-title {
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+      color: var(--dark);
+      letter-spacing: -0.02em;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, var(--primary), #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.05rem;
+      color: var(--slate);
+      margin-bottom: 2rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      padding: 0.9rem 1.6rem;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--dark);
+      padding: 0.9rem 1.6rem;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* --- HERO MOCKUP --- */
+    .app-preview-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    .preview-header {
+      background: var(--dark);
+      color: white;
+      padding: 1rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-badge {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      padding: 4px 10px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .preview-body {
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    .metric-card {
+      background: var(--light-bg);
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .metric-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .metric-label {
+      font-size: 0.78rem;
+      color: var(--slate);
+    }
+
+    .scanner-demo {
+      background: #000;
+      color: white;
+      padding: 1.25rem;
+      border-radius: 12px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scanner-line {
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background: var(--primary);
+      left: 0;
+      top: 50%;
+      box-shadow: 0 0 10px var(--primary);
+      animation: scan 2s infinite linear;
+    }
+
+    @keyframes scan {
+      0% { top: 10%; }
+      50% { top: 90%; }
+      100% { top: 10%; }
+    }
+
+    /* --- FEATURES SECTION --- */
+    .features {
+      padding: 4rem 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 3rem;
+    }
+
+    .section-header h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-header p {
+      color: var(--slate);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      padding: 1.75rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.15rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    .feature-card p {
+      color: var(--slate);
+      font-size: 0.9rem;
+    }
+
+    /* --- LIVE TRACKING SIMULATOR --- */
+    .tracking-section {
+      background: var(--dark);
+      color: white;
+      padding: 4rem 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .tracking-container {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .tracking-box {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 1.5rem;
+    }
+
+    .tracking-form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+
+    .tracking-input {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
+      font-size: 0.95rem;
+    }
+
+    .tracking-result {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: left;
+      display: none;
+    }
+
+    .tracking-timeline {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+    }
+
+    .tracking-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .step-active {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .step-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #334155;
+    }
+
+    .step-active .step-icon {
+      background: var(--primary);
+      border-color: #60a5fa;
+      color: white;
+    }
+
+    /* --- FOOTER --- */
+    footer {
+      background: white;
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      color: var(--slate);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        padding: 0.6rem 1rem;
+      }
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 6rem;
+        text-align: center;
+      }
+      .hero-title {
+        font-size: 2.1rem;
+      }
+      .hero-actions {
+        justify-content: center;
+        flex-direction: column;
+        width: 100%;
+      }
+      .btn-primary, .btn-secondary {
+        width: 100%;
+        justify-content: center;
+      }
+      .nav-links {
+        display: none;
+      }
+      .tracking-form {
+        flex-direction: column;
+      }
+      .tracking-timeline {
+        gap: 5px;
+      }
+      .tracking-step span {
+        font-size: 0.65rem;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <img src="https://lh3.googleusercontent.com/d/1oL2f76kZu7bM0JVvcVgL9jtYniuKQtSc" class="brand-logo" alt="Logo Transportes Leen">
+        <span>Transportes Leen</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#caracteristicas">Características</a></li>
+        <li><a href="#rastreo">Rastreador Demo</a></li>
+        <li><a href="panel-admin.html" target="_blank" class="btn-nav">Ir al Panel Admin</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i data-lucide="zap" size="16"></i> Sistema Inteligente de Repartos
+      </div>
+      <h1 class="hero-title">Gestión de Logística y Entregas en <span>Tiempo Real</span></h1>
+      <p class="hero-subtitle">
+        Optimiza tus rutas, controla inventarios con escáner QR integrado y ofrece seguimiento transparente a tus clientes en un solo panel de administración centralizado.
+      </p>
+      <div class="hero-actions">
+        <a href="panel-admin.html" target="_blank" class="btn-primary">
+          Probar Panel de Control <i data-lucide="arrow-right" size="18"></i>
+        </a>
+        <a href="#rastreo" class="btn-secondary">
+          Probar Rastreador
+        </a>
+      </div>
+    </div>
+
+    <!-- HERO VISUAL / MOCKUP -->
+    <div class="hero-visual">
+      <div class="app-preview-card">
+        <div class="preview-header">
+          <span>⚙️ Administración - Transportes Leen</span>
+          <div class="status-badge">
+            <i data-lucide="wifi" size="12"></i> En Línea
+          </div>
+        </div>
+        <div class="preview-body">
+          <img src="https://lh3.googleusercontent.com/d/1oL2f76kZu7bM0JVvcVgL9jtYniuKQtSc" class="brand-logo-hero" alt="Transportes Leen">
+
+          <div class="metric-grid">
+            <div class="metric-card">
+              <div class="metric-value">128</div>
+              <div class="metric-label">Envíos Hoy</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value">98.4%</div>
+              <div class="metric-label">Efectividad Entregas</div>
+            </div>
+          </div>
+
+          <div class="scanner-demo">
+            <div class="scanner-line"></div>
+            <i data-lucide="qr-code" size="40" style="opacity: 0.7; margin-bottom: 8px;"></i>
+            <p style="font-size: 0.85rem; font-weight: 500;">Escáner de Recepción Activo</p>
+            <p style="font-size: 0.75rem; color: #94a3b8;">Apunta la cámara al código de la etiqueta</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="caracteristicas">
+    <div class="section-header">
+      <h2>Todo lo que tu empresa de transportes necesita</h2>
+      <p>Una suite tecnológica diseñada para simplificar la logística y acelerar los tiempos de despacho.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i data-lucide="scan"></i></div>
+        <h3>Escaner de Recepción</h3>
+        <p>Lectura instantánea de códigos de barras y códigos QR usando la cámara del teléfono o tablet para la entrada/salida de paquetes.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i data-lucide="layout-dashboard"></i></div>
+        <h3>Panel de Administración</h3>
+        <p>Control centralizado para gestionar usuarios, repartidores, rutas y estados de entrega en tiempo real sin complicaciones.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i data-lucide="map-pin"></i></div>
+        <h3>Rastreo para Clientes</h3>
+        <p>Permite que tus clientes consulten el estado de sus pedidos con su número de seguimiento único desde cualquier dispositivo.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i data-lucide="shield-check"></i></div>
+        <h3>Autenticación Segura</h3>
+        <p>Verificación de sesión y permisos para garantizar que sólo el personal autorizado gestione el sistema de reparto.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE TRACKING SIMULATOR -->
+  <section class="tracking-section" id="rastreo">
+    <div class="tracking-container">
+      <h2>Simulador de Rastreo de Paquetes</h2>
+      <p style="color: #94a3b8; margin-top: 0.5rem;">Prueba ingresar un número de seguimiento para ver la demostración interactiva:</p>
+
+      <div class="tracking-box">
+        <div class="tracking-form">
+          <input type="text" id="trackingInput" class="tracking-input" placeholder="Ej: TL-8823, TL-1045" value="TL-8823">
+          <button class="btn-primary" onclick="buscarPaquete()">Consultar Estado</button>
+        </div>
+
+        <div id="trackingResult" class="tracking-result">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">
+            <div>
+              <p style="font-size: 0.8rem; color: #94a3b8;">Número de Guía</p>
+              <h4 id="guiaCode" style="font-size: 1.1rem; font-weight: 700;">TL-8823</h4>
+            </div>
+            <div>
+              <span style="background: rgba(16,185,129,0.2); color: #34d399; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: 600;">En Ruta</span>
+            </div>
+          </div>
+
+          <div class="tracking-timeline">
+            <div class="tracking-step step-active">
+              <div class="step-icon"><i data-lucide="package-check" size="14"></i></div>
+              <span>Recibido</span>
+            </div>
+            <div class="tracking-step step-active">
+              <div class="step-icon"><i data-lucide="warehouse" size="14"></i></div>
+              <span>Logística</span>
+            </div>
+            <div class="tracking-step step-active">
+              <div class="step-icon"><i data-lucide="truck" size="14"></i></div>
+              <span>En Ruta</span>
+            </div>
+            <div class="tracking-step">
+              <div class="step-icon"><i data-lucide="home" size="14"></i></div>
+              <span>Entregado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div class="logo">
+        <img src="https://lh3.googleusercontent.com/d/1oL2f76kZu7bM0JVvcVgL9jtYniuKQtSc" class="brand-logo" style="height:36px; width:36px;" alt="Transportes Leen">
+        <span>Transportes Leen</span>
+      </div>
+      <p>© 2026 Transportes Leen - Gestión de Repartos.</p>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    function buscarPaquete() {
+      const code = document.getElementById('trackingInput').value.trim();
+      const resultBox = document.getElementById('trackingResult');
+      const guiaCode = document.getElementById('guiaCode');
+
+      if (!code) {
+        alert('Por favor ingresa un número de guía válido.');
+        return;
+      }
+
+      guiaCode.textContent = code.toUpperCase();
+      resultBox.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
